@@ -29,10 +29,12 @@ docker run -p 3307:3306 -d 2-docker-volumes
 select * from projects;
 ```
 
-6. Create a `volume` in the container
+6. Create a `volume` in the container, name it however you like, in this example we use `host`, located in the host in `D:\development\academia\2-docker-volumes\src\host`
 
-```Dockerfile
-VOLUME host container
-```
+Command should be:
+`-v /source/host/volume:/docker/container/folder`
+
+For this example:
+`-v D:\development\academia\2-docker-volumes\src\host:/var/lib/mysql`
 
 7. Repeat steps 1-4, data should be persistent
