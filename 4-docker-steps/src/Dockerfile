@@ -4,7 +4,7 @@ COPY app/ .
 RUN npm ci
 RUN npm run build
 
-FROM nginx:1.21.0-alpine
+FROM nginx:1.23.0
 COPY --from=build /frontend/build/ /usr/share/nginx/html
 COPY --from=build /frontend/nginx/nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
