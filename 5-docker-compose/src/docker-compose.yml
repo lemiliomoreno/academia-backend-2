@@ -30,3 +30,12 @@ services:
         condition: service_healthy
     networks:
       - mysamplenetwork
+
+  frontend:
+    build: ./frontend
+    ports:
+      - 80:80
+    depends_on:
+      - api
+    networks:
+      - mysamplenetwork
