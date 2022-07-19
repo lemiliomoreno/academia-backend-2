@@ -1,0 +1,30 @@
+version: "3.9"
+
+networks:
+  mynetwork:
+    driver: bridge
+
+services:
+  database:
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
+    networks:
+      - mynetwork
+
+  api:
+    build: ./api
+    volumes:
+      - ./api:/code
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    networks:
+      - mynetwork
+    depends_on:
+      - database
