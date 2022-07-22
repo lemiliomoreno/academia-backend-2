@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI
 from pydantic import BaseModel
 from sqlalchemy import create_engine, Boolean, Column, Integer, String
@@ -5,11 +7,17 @@ from sqlalchemy.orm import relationship, Session
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
+
+# load environment variables
+
+POSTGRES_DB = os.getenv("POSTGRES_DB")
+POSTGRES_USER = os.getenv("POSTGRES_USER")
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
+POSTGRES_HOSTNAME = os.getenv("POSTGRES_HOSTNAME")
+
 # db tables
 
-engine = create_engine(
-    "postgresql+psycopg2://postgres:postgres@localhost:5432/mydb"
-)
+engine = create_engine(f"postgresql+psycopg2://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOSTNAME}:5432/{POSTGRES_DB}")
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
