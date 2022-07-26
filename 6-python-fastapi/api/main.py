@@ -17,11 +17,14 @@ POSTGRES_HOSTNAME = os.getenv("POSTGRES_HOSTNAME")
 
 # db tables
 
-engine = create_engine(f"postgresql+psycopg2://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOSTNAME}:5432/{POSTGRES_DB}")
+engine = create_engine(
+    f"postgresql+psycopg2://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOSTNAME}:5432/{POSTGRES_DB}"
+)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
+
 
 class User(Base):
     __tablename__ = "users"
@@ -36,6 +39,7 @@ Base.metadata.create_all(bind=engine)
 
 
 # models
+
 
 class CreateUser(BaseModel):
     email: str
@@ -53,7 +57,9 @@ def ping():
 
 @app.post("/users")
 def create_user(user: CreateUser):
-    db_user = User(email=user.email, hashed_password=user.hashed_password, is_active=user.is_active)
+    db_user = User(
+        email=user.email, hashed_password=user.hashed_password, is_active=user.is_active
+    )
 
     with Session(engine) as session:
         session.add(db_user)
