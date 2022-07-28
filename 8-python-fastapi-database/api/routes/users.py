@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
 from models.database import User
@@ -15,10 +16,7 @@ def get_users(db: Session = Depends(get_db)):
     db_users = db.query(User).all()
 
     return JSONResponse(
-        content=[
-            {"email": db_user.email, "password": db_user.password, "name": db_user.name}
-            for db_user in db_users
-        ],
+        content=jsonable_encoder(db_users),
         status_code=200,
     )
 
@@ -35,10 +33,6 @@ def create_user(create_user: CreateUser, db: Session = Depends(get_db)):
     user_created = db.query(User).filter(User.email == create_user.email)[0]
 
     return JSONResponse(
-        content={
-            "email": user_created.email,
-            "password": user_created.password,
-            "name": user_created.name,
-        },
+        content=jsonable_encoder(user_created),
         status_code=201,
     )
