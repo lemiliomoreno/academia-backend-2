@@ -2,17 +2,20 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
+from psycopg2.errorcodes import UNIQUE_VIOLATION
 
 from models.database import User
 from models.users import CreateUser
 from utils.database import get_db
+from utils.exceptions import DuplicateRecord
 
 
 router = APIRouter(prefix="/users", tags=["users"])
 
 
 @router.get("")
-def get_users(db: Session = Depends(get_db)):
+async def get_users(db: Session = Depends(get_db)):
     db_users = db.query(User).all()
 
     return JSONResponse(
@@ -22,13 +25,19 @@ def get_users(db: Session = Depends(get_db)):
 
 
 @router.post("")
-def create_user(create_user: CreateUser, db: Session = Depends(get_db)):
+async def create_user(create_user: CreateUser, db: Session = Depends(get_db)):
     user = User(
         email=create_user.email, password=create_user.password, name=create_user.name
     )
 
     db.add(user)
-    db.commit()
+
+    try:
+        db.commit()
+
+    except IntegrityError as err:
+        if err.orig.pgcode == UNIQUE_VIOLATION:
+            raise DuplicateRecord(f"User {create_user.email} already exists.")
 
     user_created = db.query(User).filter(User.email == create_user.email)[0]
 
