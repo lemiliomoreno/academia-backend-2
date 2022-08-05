@@ -8,6 +8,11 @@ class DuplicateRecord(Exception):
         self.detail = detail
 
 
+class Unauthorized(Exception):
+    def __init__(self, detail):
+        self.detail = detail
+
+
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     return JSONResponse(
         status_code=400,
@@ -15,8 +20,8 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
             "type": "bad_request",
             "title": "Bad Request",
             "detail": "The payload is not valid.",
-            "status": 400
-        }
+            "status": 400,
+        },
     )
 
 
@@ -27,8 +32,8 @@ async def duplicate_record_exception_handler(request: Request, exc: DuplicateRec
             "type": "duplicate_record",
             "title": "Duplicate Record",
             "detail": exc.detail,
-            "status": 409
-        }
+            "status": 409,
+        },
     )
 
 
@@ -39,6 +44,18 @@ async def exception_handler(request: Request, exc: Exception):
             "type": "internal_server_error",
             "title": "Internal Server Error",
             "detail": "There was an error processing your request.",
-            "status": 500
-        }
+            "status": 500,
+        },
+    )
+
+
+async def unauthorized_handler(request: Request, exc: Unauthorized):
+    return JSONResponse(
+        status_code=401,
+        content={
+            "type": "unauthorized",
+            "title": "Unauthorized",
+            "detail": exc.detail,
+            "status": 401,
+        },
     )

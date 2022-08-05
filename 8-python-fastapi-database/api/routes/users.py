@@ -1,3 +1,5 @@
+from secrets import token_hex
+
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
@@ -9,12 +11,13 @@ from models.database import User
 from models.users import CreateUser
 from utils.database import get_db
 from utils.exceptions import DuplicateRecord
+from utils.auth import authenticate
 
 
 router = APIRouter(prefix="/users", tags=["users"])
 
 
-@router.get("")
+@router.get("", dependencies=[Depends(authenticate)])
 async def get_users(db: Session = Depends(get_db)):
     db_users = db.query(User).all()
 
@@ -27,7 +30,7 @@ async def get_users(db: Session = Depends(get_db)):
 @router.post("")
 async def create_user(create_user: CreateUser, db: Session = Depends(get_db)):
     user = User(
-        email=create_user.email, password=create_user.password, name=create_user.name
+        email=create_user.email, password=create_user.password, name=create_user.name, token=token_hex(16),
     )
 
     db.add(user)

@@ -10,3 +10,4 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     password = Column(String)
     name = Column(String)
+    token = Column(String)
